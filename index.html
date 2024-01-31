@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Library Project</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="nav">
+                <h1>Library</h1>
+            </div>
+            <div class="main">
+                <div class="add-button-container">
+                    <button class="open-button">+ Add Book</button>
+                </div>
+                <div class="card-container">
+               
+                </div>
+            </div>
+        </div>
+
+        <dialog class="modal" id="modal">
+            <h2>Add new book</h2>
+            <form class='form' method='dialog'>
+                <div class="form-row">
+                <input type="text" id="form-title" placeholder="Title">
+                </div>
+                <div class="form-row">
+                <input type="text" id="form-author" placeholder="Author">
+                </div>
+                <div class="form-row">
+                <input type="number" id="form-pages" placeholder="Pages">
+                </div>
+                <div class="is-read">
+                <label class="checkbox-label">Have you read it?</label>
+                    <input class="checkbox" id="form-read" type="checkbox">
+                </div>
+                <button class="submit-form" id="submit-form" type="submit">Submit Form</button>
+            </form>
+        </dialog>
+
+        
+    
+        <script src="script.js" async defer></script>
+    </body>
+</html>
