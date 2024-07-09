@@ -1,4 +1,4 @@
-// ES6 Classes
+// Refactored using ES6 Classes
 class Book {
     constructor(title, author, pages, read) {
         this.title = title;
