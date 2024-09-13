@@ -1,4 +1,5 @@
-// Refactored using ES6 Classes
+// Refactored using ES6 Classes and SOLID Principles
+// Single Responsibility: Represents a book
 class Book {
     constructor(title, author, pages, read) {
         this.title = title;
@@ -7,82 +8,80 @@ class Book {
         this.read = read;
     }
 
-    // method to toggle read
     toggleRead() {
         this.read = !this.read;
     }
 }
 
-class Library {
-    constructor() {
-        this.myLibrary = [];
-        this.cardContainer = document.querySelector('.card-container');
-        this.openButton = document.querySelector('.open-button');
-        this.modal = document.querySelector('#modal');
+// Single Responsibility: Handles UI interactions for the form
+class BookForm {
+    constructor(onSubmit) {
         this.titleInput = document.querySelector('#form-title');
         this.authorInput = document.querySelector('#form-author');
         this.pagesInput = document.querySelector('#form-pages');
         this.readInput = document.querySelector('#form-read');
         this.submitFormBtn = document.querySelector('#submit-form');
 
-        this.initialize();
+        this.submitFormBtn.addEventListener('click', () => onSubmit(this.getBookFromForm()));
     }
 
-    // method to initialize
-    initialize() {
-        this.submitFormBtn.addEventListener('click', () => this.addBookFromForm());
-        this.openButton.addEventListener('click', () => this.modal.showModal());
-        this.loopThroughLibrary();
-    }
-
-    // method to add book from form
-    addBookFromForm() {
+    getBookFromForm() {
         const title = this.titleInput.value;
         const author = this.authorInput.value;
         const pages = this.pagesInput.value;
-        const read = this.readInput.checked ? true : false;
+        const read = this.readInput.checked;
 
-        const newBook = new Book(title, author, pages, read);
-        this.addBookToLibrary(newBook);
         this.clearForm();
-        this.render();
+        return new Book(title, author, pages, read);
     }
 
-    // method to add book to library
-    addBookToLibrary(book) {
-        this.myLibrary.push(book);
-    }
-
-    // method to clear form
     clearForm() {
         this.titleInput.value = '';
         this.authorInput.value = '';
         this.pagesInput.value = '';
         this.readInput.checked = false;
     }
+}
 
-    // method to loop through library
-    loopThroughLibrary() {
-        this.cardContainer.innerHTML = '';
-        this.myLibrary.forEach((book, index) => this.createBookCard(book, index));
+// Single Responsibility: Manages the collection of books
+class Library {
+    constructor() {
+        this.myLibrary = [];
     }
 
-    // method  to create book card
+    addBook(book) {
+        this.myLibrary.push(book);
+    }
+
+    removeBook(index) {
+        this.myLibrary.splice(index, 1);
+    }
+
+    getBooks() {
+        return this.myLibrary;
+    }
+}
+
+// Single Responsibility: Renders the UI for the library
+class LibraryUI {
+    constructor(library, cardContainerSelector) {
+        this.library = library;
+        this.cardContainer = document.querySelector(cardContainerSelector);
+    }
+
+    render() {
+        this.cardContainer.innerHTML = '';
+        this.library.getBooks().forEach((book, index) => this.createBookCard(book, index));
+    }
+
     createBookCard(book, index) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card';
         cardDiv.setAttribute('data-index', index);
 
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = `${book.title}`;
-
-        const authorSpan = document.createElement('span');
-        authorSpan.textContent = `By ${book.author}`;
-
-        const pagesSpan = document.createElement('span');
-        pagesSpan.className = 'pages';
-        pagesSpan.textContent = `Pages: ${book.pages}`;
-
+        const titleSpan = this.createSpan(book.title);
+        const authorSpan = this.createSpan(`By ${book.author}`);
+        const pagesSpan = this.createSpan(`Pages: ${book.pages}`, 'pages');
         const readBtn = this.createReadButton(book);
         const removeBtn = this.createRemoveButton(index);
 
@@ -95,7 +94,13 @@ class Library {
         this.cardContainer.appendChild(cardDiv);
     }
 
-    // method to create read button
+    createSpan(text, className = '') {
+        const span = document.createElement('span');
+        span.textContent = text;
+        if (className) span.className = className;
+        return span;
+    }
+
     createReadButton(book) {
         const readBtn = document.createElement('button');
         readBtn.className = 'cardReadBtn';
@@ -108,48 +113,54 @@ class Library {
             this.setReadButtonColor(readBtn, book.read);
         });
 
-        readBtn.addEventListener('mouseover', () => {
-            readBtn.style.backgroundColor = book.read ? "rgba(45, 106, 79, 0.7)" : "#e8edf4";
-        });
-
-        readBtn.addEventListener('mouseout', () => {
-            this.setReadButtonColor(readBtn, book.read);
-        });
-
         return readBtn;
     }
 
-    // method to set read button color
-    setReadButtonColor(button, read) {
-        button.style.backgroundColor = read ? "rgba(64, 145, 108, 0.7" : "#d1d5db";
-    }
-
-    // method to create button
     createRemoveButton(index) {
         const removeBtn = document.createElement('button');
         removeBtn.className = 'cardRemoveBtn';
         removeBtn.textContent = 'Delete';
 
         removeBtn.addEventListener('click', () => {
-            this.myLibrary.splice(index, 1);
+            this.library.removeBook(index);
             this.render();
         });
 
         return removeBtn;
     }
 
-    // method to render
-    render() {
-        this.cardContainer.innerHTML = '';
-        this.loopThroughLibrary();
+    setReadButtonColor(button, read) {
+        button.style.backgroundColor = read ? "rgba(64, 145, 108, 0.7)" : "#d1d5db";
+    }
+}
+
+// Single Responsibility: Manages the application logic
+class LibraryApp {
+    constructor() {
+        this.library = new Library();
+        this.libraryUI = new LibraryUI(this.library, '.card-container');
+        this.bookForm = new BookForm(book => this.handleBookFormSubmit(book));
+
+        this.setupEventListeners();
+        this.libraryUI.render();
+    }
+
+    setupEventListeners() {
+        const openButton = document.querySelector('.open-button');
+        const modal = document.querySelector('#modal');
+
+        openButton.addEventListener('click', () => modal.showModal());
+    }
+
+    handleBookFormSubmit(book) {
+        this.library.addBook(book);
+        this.libraryUI.render();
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const library = new Library();
+    new LibraryApp();
 });
-
-
 
 
 
