@@ -149,7 +149,10 @@ class LibraryApp {
         const openButton = document.querySelector('.open-button');
         const modal = document.querySelector('#modal');
 
-        openButton.addEventListener('click', () => modal.showModal());
+        openButton.addEventListener('click', () => {
+        console.log('Modal is being opened');
+        modal.showModal();
+});
     }
 
     handleBookFormSubmit(book) {
