@@ -1,7 +1,5 @@
 # Library Project
 
-### Explanation:
-
 1. **Book Class**:
     - Handles individual book properties and methods.
     - The `toggleRead` method toggles the `read` status of the book.
