@@ -26,15 +26,18 @@
 
         <dialog class="modal" id="modal">
             <h2>Add new book</h2>
-            <form class='form' method='dialog'>
+            <form novalidate class='form' id="book-form">
                 <div class="form-row">
-                <input type="text" id="form-title" placeholder="Title">
+                <input type="text" id="form-title" placeholder="Title" required>
+                <span class="error" id="form-title-error" aria-live="polite"></span>
                 </div>
                 <div class="form-row">
-                <input type="text" id="form-author" placeholder="Author">
+                <input type="text" id="form-author" placeholder="Author" required>
+                <span class="error" id="form-author-error" aria-live="polite"></span>
                 </div>
                 <div class="form-row">
-                <input type="number" id="form-pages" placeholder="Pages">
+                <input type="number" id="form-pages" placeholder="Pages" required>
+                <span class="error" id="form-pages-error" aria-live="polite"></span>
                 </div>
                 <div class="is-read">
                 <label class="checkbox-label">Have you read it?</label>

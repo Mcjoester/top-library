@@ -20,9 +20,55 @@ class BookForm {
         this.authorInput = document.querySelector('#form-author');
         this.pagesInput = document.querySelector('#form-pages');
         this.readInput = document.querySelector('#form-read');
-        this.submitFormBtn = document.querySelector('#submit-form');
 
-        this.submitFormBtn.addEventListener('click', () => onSubmit(this.getBookFromForm()));
+        this.form = document.querySelector('#book-form');
+        this.modal = document.querySelector('#modal');
+
+        // error spans
+        this.titleError = document.querySelector('#form-title-error');
+        this.authorError = document.querySelector('#form-author-error');
+        this.pagesError = document.querySelector('#form-pages-error');
+
+        // input event listeners
+        this.titleInput.addEventListener('input', () => this.validateField(this.titleInput, this.titleError, 'Title field cannot be empty.'));
+        this.authorInput.addEventListener('input', () => this.validateField(this.authorInput, this.authorError, 'Author field cannot be empty'));
+        this.pagesInput.addEventListener('input', () => this.validateField(this.pagesInput, this.pagesError, 'Pages field cannot be empty'));
+
+        // form event listener
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const isTitleValid = this.validateField(this.titleInput, this.titleError, 'Title field cannot be empty.');
+            const isAuthorValid = this.validateField(this.authorInput, this.authorError, 'Author field cannot be empty');
+            const isPagesValid = this.validateField(this.pagesInput, this.pagesError, 'Pages field cannot be empty');
+
+            if (!isTitleValid || !isAuthorValid || !isPagesValid) return
+
+            onSubmit(this.getBookFromForm());
+            this.modal.close();
+        });
+
+        this.modal.addEventListener('close', () => {
+            console.log('clearing the form');
+            this.clearForm();
+        });
+    }
+
+    validateField(input, errorElement, message) {
+        if (input.validity.valueMissing) {
+            input.classList.remove('green');
+            input.classList.add('red');
+
+            errorElement.textContent = message;
+            errorElement.classList.add('active');
+            return false;
+        } else {
+            input.classList.remove('red');
+            input.classList.add('green');
+            errorElement.textContent = '';
+            errorElement.classList.remove('active');
+            return true;
+        }
     }
 
     getBookFromForm() {
@@ -40,6 +86,18 @@ class BookForm {
         this.authorInput.value = '';
         this.pagesInput.value = '';
         this.readInput.checked = false;
+
+        this.titleError.textContent = '';
+        this.authorError.textContent = '';
+        this.pagesError.textContent = '';
+
+        this.titleError.classList.remove('active');
+        this.authorError.classList.remove('active');
+        this.pagesError.classList.remove('active');
+
+        this.titleInput.classList.remove('green', 'red');
+        this.authorInput.classList.remove('green', 'red');
+        this.pagesInput.classList.remove('green', 'red');
     }
 }
 
@@ -156,6 +214,8 @@ class LibraryApp {
     }
 
     handleBookFormSubmit(book) {
+        const modal = document.querySelector('#modal');
+        modal.close();
         this.library.addBook(book);
         this.libraryUI.render();
     }
